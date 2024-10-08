@@ -55,8 +55,8 @@ while True:
     # Loop through each contour
     for contour in contours:
         
-        area = cv2.contourArea(contour)
-        approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True)
+        area = cv2.contourArea(contour)#The function computes a contour area. Similarly to moments , the area is computed using the Green formula. Thus, the returned area and the number of non-zero pixels, if you draw the contour using drawContours or fillPoly , can be different.
+        approx = cv2.approxPolyDP(contour, 0.01 * cv2.arcLength(contour, True), True) # approximates a curve or a polygon with another curve/polygon with less vertices so that the distance between them is less or equal to the specified precision. It uses the Douglas-Peucker algorithm
         
 
         if area > 650 and area < 950:  # Filter small areas
@@ -64,18 +64,18 @@ while True:
             # Calculate the moments of the contour
             if len(approx) >= 4:
                 x, y, w, h = cv2.boundingRect(approx)
-                cx, cy = x + w // 2, y + h // 2
+                cx, cy = x + w // 2, y + h // 2 #center
                 measured = np.array([[np.float32(cx)], [np.float32(cy)]])  # Measurement for Kalman filter
                 cv2.circle(cropped_image, (cx, cy), 8, (0, 165, 255), -1)  # Radius 8, orange
     
     # Kalman Filter: Prediction step
-    prediction = kalman.predict()
+    prediction = kalman.predict()#the Kalman filter estimates the next position of the object based on the previous state (position and velocity). This prediction helps track the object even when it temporarily disappears or is occluded
 
     if measured is not None:
         # Kalman Filter: Correction step if a measurement is available
         kalman.correct(measured)
         measured_x, measured_y = int(measured[0]), int(measured[1])
-        cv2.circle(cropped_image, (measured_x, measured_y), 3, (100, 0, 255), -1)  # Purple
+        cv2.circle(cropped_image, (measured_x, measured_y), 3, (100, 0, 255), -1)  # mini
     else:
         # Use predicted value if no measurement is available (i.e., object is temporarily lost)
         measured_x, measured_y = None, None
